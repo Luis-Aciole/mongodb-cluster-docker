@@ -1,0 +1,60 @@
+
+docker pull mongodb/mongodb-community-server:latest
+
+docker run --name mongodb1 -p 27017:27017 -d mongodb/mongodb-community-server:latest
+
+
+docker network create mongoCluster
+
+docker run -d --rm -p 27017:27017 --name mongo1 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo1
+
+docker run -d --rm -p 27018:27017 --name mongo2 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo2
+
+docker run -d --rm -p 27019:27017 --name mongo3 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo3
+
+docker run -d --rm -p 27020:27017 --name mongo4 --network mongoCluster mongodb/mongodb-community-server:latest --replSet myReplicaSet --bind_ip localhost,mongo4
+
+docker exec -it mongo1 mongosh
+
+db.runCommand ({hello:1})
+
+rs.initiate ({ _id: "myReplicaSet", members:[{_id:0, host: "mongo1"}, {_id:1, host: "mongo2"}, {_id:3, host: "mongo3"}]}) 
+
+exit
+
+docker exec -it mongo1 mongosh --eval "rs.status()"
+
+
+
+
+rs.isMaster().primary
+
+use CorporeSystem
+
+db.cliente.insertOne({codigo:1, nome: "Jorge Amaro"});
+db.cliente.insertOne({codigo:2, nome: "Max Verstappen"});
+db.cliente.insertOne({codigo:3, nome: "Tim Maia"});
+db.cliente.insertOne({codigo:4, nome: "Gloria Groove"});
+db.cliente.insertOne({codigo:5, nome: "Jailson Mendes"});
+
+db.cliente.find()
+
+docker stop mongo1
+
+Visualizar queda de do mongo:
+
+docker exec -it mongo2 mongosh --eval "rs.status()"
+
+docker exec -it mongo2 mongosh
+
+mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.4.2
+
+mongodb://127.0.0.1:27018/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.4.2
+
+rs.remove("mongo1:27017")
+
+rs.status()
+
+
+
+
